@@ -182,19 +182,89 @@ end)
 
 -- Trigger script from dummy items spoiling - we use this to correct the quality of items
 -- like the rocket part (that are problematic if we use multiple qualities).
+---@param e EventData.on_script_trigger_effect The script trigger event.
 script.on_event(defines.events.on_script_trigger_effect, function(e)
-    if (e.effect_id == "aq-spoiled-quality" and e.cause_entity) then
-        local inv = e.cause_entity.get_output_inventory()
+    if (e.effect_id == "aq-spoiled-quality") then
+        -- Get the entity to work against
+        local entity = e.cause_entity
+        if (entity and entity.type ~= "assmebling-machine") then
+            log("[AQ]     foo = " .. entity.type .. string.sub(entity.type, 1, 6))
+            -- Inserters
+            if (entity.type == "inserter") then
+                entity = entity.pickup_target
+            -- Loaders
+            elseif (string.sub(entity.type, 1, 6) == "loader") then
+                -- The loader most likely picked up both items and we have to fix the quality here.
+                for i = 1, entity.get_max_transport_line_index() do
+                    local line = entity.get_transport_line(i)
+                    local contents = line.get_contents()
+                    for pos, item in ipairs(contents) do
+                        if (item.quality ~= "normal-0") then
+                            line.remove_item({
+                                name = item.name,
+                                count = item.count,
+                                quality = item.quality,
+                            })
+                            if (line.can_insert_at_back()) then
+                            line.insert_at_back({
+                                name = item.name,
+                                count = item.count,
+                                quality = "normal-0"
+                            })
+                            end
+                        end
+                    end
+                end
+
+                -- We will still do a check on the linked assembler.
+                entity = entity.loader_container
+            end
+        end
+        if (entity == nil) then return end
+
+        local inv = entity.get_output_inventory()
         convert_quality(inv, "normal-0", false)
 
-        -- Give bonus progress for high quality
-        -- TODO: We lie and don't overflow the bonus amount because it's hard...
-        --       ...but we also trigger this on the bonus crafts, so it's kind of fair.
-        ---@type LuaQualityPrototype
-        local quality = prototypes.quality[e.quality]
-        local bonus_productivity = (quality.default_multiplier - 1) / 4
-        if (bonus_productivity > 0) then
-            e.cause_entity.bonus_progress = math.min(e.cause_entity.bonus_progress + bonus_productivity, 1)
+        if (entity.type == "gui-assembling-machine") then
+            -- Give bonus progress for high quality
+            -- TODO: We lie and don't overflow the bonus amount because it's hard...
+            --       ...but we also trigger this on the bonus crafts, so it's kind of fair.
+            ---@type LuaQualityPrototype
+            local quality = prototypes.quality[e.quality]
+            local bonus_productivity = (quality.default_multiplier - 1) / 4
+            if (bonus_productivity > 0) then
+                entity.bonus_progress = math.min(entity.bonus_progress + bonus_productivity, 1)
+            end
+        end
+    end
+end)
+
+---Event handler for player surface changes - triggers off-world research on first visit.
+---@param event EventData.on_player_changed_surface The on_player_changed_surface event.
+script.on_event(defines.events.on_player_changed_surface, function(event)
+    local player = game.get_player(event.player_index)
+    if (not player or not player.character) then
+        return
+    end
+
+    local surface = player.surface
+    -- Check if player is on a non-Nauvis planet
+    if (surface.index ~= 1 and surface.planet ~= nil) then
+        -- Initialize storage if needed
+        if (not storage.first_time_offworld_triggered) then
+            storage.first_time_offworld_triggered = {}
+        end
+
+        local force = player.force
+        local force_name = force.name
+
+        -- Check if this force has already triggered the off-world event
+        if (not storage.first_time_offworld_triggered[force_name]) then
+            -- Mark as triggered
+            storage.first_time_offworld_triggered[force_name] = true
+
+            -- Trigger the scripted research trigger event
+            force.script_trigger_research("aq-rare-plus-quality")
         end
     end
 end)

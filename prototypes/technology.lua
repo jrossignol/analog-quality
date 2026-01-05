@@ -200,7 +200,15 @@ data:extend({ create_quality_tech(
     "rare",
     "rare-plus-quality",
     0, 11,
-    trigger_scripted("rare-plus-quality-tech-trigger"),
+    {
+        type = "scripted",
+        trigger_description = { "analog-quality.first-time-offworld" },
+        icons = { {
+            icon = "__space-age__/graphics/technology/gleba.png",
+            icon_size = 256,
+            icon_scale = 32,
+        } }
+    },
     { "space-platform-thruster" }
 )})
 
@@ -208,7 +216,7 @@ data:extend({ create_quality_tech(
 local epic_tech = data.raw.technology["epic-quality"]
 epic_tech.prerequisites = { "aq-rare-plus-quality" }
 epic_tech.unit = nil
-epic_tech.research_trigger = trigger_scripted("epic-quality-tech-trigger")
+epic_tech.research_trigger = trigger_scripted("aq-offworld-science-1")
 remove_quality_unlocks(epic_tech)
 add_qualities_to_tech("rare", epic_tech, 12, 23)
 
@@ -217,7 +225,7 @@ data:extend({ create_quality_tech(
     "epic",
     "epic-plus-quality",
     0, 11,
-    trigger_scripted("epic-plus-quality-tech-trigger"),
+    trigger_scripted("aq-offworld-science-2"),
     { "epic-quality" }
 )})
 
@@ -225,7 +233,7 @@ data:extend({ create_quality_tech(
 local legendary_tech = data.raw.technology["legendary-quality"]
 legendary_tech.prerequisites = { "aq-epic-plus-quality" }
 legendary_tech.unit = nil
-legendary_tech.research_trigger = trigger_scripted("legendary-quality-tech-trigger")
+legendary_tech.research_trigger = trigger_scripted("aq-offworld-science-3")
 remove_quality_unlocks(legendary_tech)
 add_qualities_to_tech("epic", legendary_tech, 12, 23)
 
