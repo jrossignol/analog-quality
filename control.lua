@@ -1,4 +1,3 @@
-
 ---Unlocks the initial quality levels.
 ---@param force LuaForce The force to add tech to.
 function init_quality(force)
@@ -98,15 +97,6 @@ script.on_init(function()
             init_quality(force)
         end
     end
-    
-    -- Configure all existing rocket silos
-    --configure_rocket_silos()
-end)
-
----Load mod state on game load
----Re-applies rocket silo configurations to ensure consistency
-script.on_configuration_changed(function()
-    --configure_rocket_silos()
 end)
 
 ---Event handling for player creation, ensures the player's force has the initial tech.
@@ -176,47 +166,22 @@ script.on_event(defines.events.on_game_created_from_scenario, function(_)
     end)
 end)
 
-script.on_event(defines.events.on_player_mined_item, function(e)
-    log("[AQ] Player mined item: " .. serpent.line(e))
-    -- For player mining events we need to do a rapid replace of what was mined if it's of base quality
-    if (e.item_stack.quality == "normal") then
-        --log("[AQ]   inventory: " .. serpent.block(game.players[e.player_index].get_main_inventory().get_contents()))
-
-        local player = game.get_player(e.player_index)
-    end
-end)
-
+-- Converted anything that is mined (including rocks) with the correct quality.
 script.on_event(defines.events.on_player_mined_entity, function(e)
     ---@type LuaForce
     local force = game.get_player(e.player_index).force
     convert_quality(e.buffer, "poor-0", true, force, 1.0)
 end)
+
+-- Quality correction - for robots.
 script.on_event(defines.events.on_robot_mined_entity, function(e)
     ---@type LuaForce
     local force = e.robot.force
     convert_quality(e.buffer, "poor-0", true, force, 1.0)
 end)
 
-script.on_event(defines.events.on_picked_up_item, function(e)
-    log("[AQ] Player picked up item: " .. serpent.line(e))
-end)
-
----Configure rocket silos when they are first built
----@param event EventData.on_built_entity | EventData.on_robot_built_entity
-local function on_rocket_silo_built(event)
-    local entity = event.entity
-    if entity and entity.valid and entity.name == "rocket-silo" then
-        ---@type LuaAssemblingMachineControlBehavior
-        local control_behavior = entity.get_control_behavior()
-        if control_behavior then
-            control_behavior.circuit_set_recipe = true
-        end
-    end
-end
-
-script.on_event(defines.events.on_built_entity, on_rocket_silo_built)
-script.on_event(defines.events.on_robot_built_entity, on_rocket_silo_built)
-
+-- Trigger script from dummy items spoiling - we use this to correct the quality of items
+-- like the rocket part (that are problematic if we use multiple qualities).
 script.on_event(defines.events.on_script_trigger_effect, function(e)
     if (e.effect_id == "aq-spoiled-quality" and e.cause_entity) then
         local inv = e.cause_entity.get_output_inventory()
