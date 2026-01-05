@@ -1,0 +1,3 @@
+- Script how speed modules lowers quality (allow quality to go down)
+- graphics for tech
+- tech trigger scripts

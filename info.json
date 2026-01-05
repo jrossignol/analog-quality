@@ -1,0 +1,21 @@
+{
+  "name": "analog-quality",
+  "version": "0.0.1",
+  "title": "Analog Quality",
+  "author": "nightingale",
+  "description": "Introduces a massive number of quality levels in between existing ones and gives inherent quality chances to miners, furnaces, and other production buildings, making quality a necessary part of gameplay.",
+  "factorio_version": "2.0",
+  "dependencies": [
+    "base >= 2.0.0",
+    "space-age >= 2.0.0",
+    "quality >= 2.0.0"
+  ],
+  "quality_required": true,
+  "package": {
+    "ignore": [
+      "graphics/**/*.xcf",
+      "CHANGELOG.md",
+      "IMPLEMENTATION_PLAN.md"
+    ]
+  }
+}
