@@ -67,16 +67,6 @@ local function trigger_craft_item(item, count)
     }
 end
 
----Helper function to create a scriptedtrigger
----@param trigger_description? LocalisedString Item name to craft
----@return data.ScriptedTechnologyTrigger Trigger definition
-local function trigger_scripted(trigger_description)
-    return {
-        type = "scripted",
-        trigger_description = trigger_description,
-    }
-end
-
 ---Removes any quality unlocks from the given technology.
 ---@param tech data.TechnologyPrototype
 local function remove_quality_unlocks(tech)
@@ -206,7 +196,6 @@ data:extend({ create_quality_tech(
         icons = { {
             icon = "__space-age__/graphics/technology/gleba.png",
             icon_size = 256,
-            icon_scale = 32,
         } }
     },
     { "space-platform-thruster" }
@@ -216,7 +205,29 @@ data:extend({ create_quality_tech(
 local epic_tech = data.raw.technology["epic-quality"]
 epic_tech.prerequisites = { "aq-rare-plus-quality" }
 epic_tech.unit = nil
-epic_tech.research_trigger = trigger_scripted("aq-offworld-science-1")
+epic_tech.research_trigger = {
+    type = "scripted",
+    trigger_description = { "analog-quality.offworld-science-1" },
+    icons = { {
+        icon = "__space-age__/graphics/icons/agricultural-science-pack.png",
+        icon_size = 64,
+        scale = 4,
+        shift = { -104, 32 },
+        floating = true,
+    }, {
+        icon = "__space-age__/graphics/icons/electromagnetic-science-pack.png",
+        icon_size = 64,
+        scale = 4,
+        shift = { 0, -32 },
+        floating = true,
+    }, {
+        icon = "__space-age__/graphics/icons/metallurgic-science-pack.png",
+        icon_size = 64,
+        scale = 4,
+        shift = { 104, 32 },
+        floating = true,
+    }}
+}
 remove_quality_unlocks(epic_tech)
 add_qualities_to_tech("rare", epic_tech, 12, 23)
 
@@ -225,7 +236,29 @@ data:extend({ create_quality_tech(
     "epic",
     "epic-plus-quality",
     0, 11,
-    trigger_scripted("aq-offworld-science-2"),
+    {
+        type = "scripted",
+        trigger_description = { "analog-quality.offworld-science-2" },
+        icons = { {
+            icon = "__space-age__/graphics/icons/agricultural-science-pack.png",
+            icon_size = 64,
+            scale = 4,
+            shift = { -104, 32 },
+            floating = true,
+        }, {
+            icon = "__space-age__/graphics/icons/electromagnetic-science-pack.png",
+            icon_size = 64,
+            scale = 4,
+            shift = { 0, -32 },
+            floating = true,
+        }, {
+            icon = "__space-age__/graphics/icons/metallurgic-science-pack.png",
+            icon_size = 64,
+            scale = 4,
+            shift = { 104, 32 },
+            floating = true,
+        }}
+    },
     { "epic-quality" }
 )})
 
@@ -233,7 +266,29 @@ data:extend({ create_quality_tech(
 local legendary_tech = data.raw.technology["legendary-quality"]
 legendary_tech.prerequisites = { "aq-epic-plus-quality" }
 legendary_tech.unit = nil
-legendary_tech.research_trigger = trigger_scripted("aq-offworld-science-3")
+legendary_tech.research_trigger = {
+    type = "scripted",
+    trigger_description = { "analog-quality.offworld-science-3" },
+    icons = { {
+        icon = "__space-age__/graphics/icons/agricultural-science-pack.png",
+        icon_size = 64,
+        scale = 4,
+        shift = { -104, 32 },
+        floating = true,
+    }, {
+        icon = "__space-age__/graphics/icons/electromagnetic-science-pack.png",
+        icon_size = 64,
+        scale = 4,
+        shift = { 0, -32 },
+        floating = true,
+    }, {
+        icon = "__space-age__/graphics/icons/metallurgic-science-pack.png",
+        icon_size = 64,
+        scale = 4,
+        shift = { 104, 32 },
+        floating = true,
+    }}
+}
 remove_quality_unlocks(legendary_tech)
 add_qualities_to_tech("epic", legendary_tech, 12, 23)
 
