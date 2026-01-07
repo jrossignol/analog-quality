@@ -28,8 +28,6 @@ function convert_quality(inventory, quality_id, check_for_normal_quality, force,
     end
 
     -- At least one normal item detected - need to convert
-    ---@type ItemStackDefinition[]
-    local new_items = {}
     for i = 1, #inventory do
         local old = inventory[i]
         if (old.valid_for_read) then
@@ -63,14 +61,10 @@ function convert_quality(inventory, quality_id, check_for_normal_quality, force,
                 custom_description = old.is_item_with_tags and old.custom_description or nil,
                 spoil_percent = old.spoil_percent,
             }
-            table.insert(new_items, new)
+            if (old.can_set_stack(new)) then
+                old.set_stack(new)
+            end
         end
-    end
-
-    -- Reconfigure inventory
-    inventory.clear()
-    for _, item in ipairs(new_items) do
-        inventory.insert(item)
     end
 end
 
@@ -178,6 +172,27 @@ script.on_event(defines.events.on_robot_mined_entity, function(e)
     ---@type LuaForce
     local force = e.robot.force
     convert_quality(e.buffer, "poor-0", true, force, 1.0)
+end)
+
+script.on_event(defines.events.on_player_mined_tile, function(e)
+    ---@type  LuaPlayer
+    local player = game.get_player(e.player_index)
+
+    ---@type LuaForce
+    local force = player.force
+
+    -- We have to scan the whole inventory anyway...  so just do a full conversion.
+    -- But keep the quality chance low to preven this from being a slot machine.
+    convert_quality(player.get_main_inventory(), "poor-0", true, force, 0.1)
+end)
+
+script.on_event(defines.events.on_robot_mined_tile, function(e)
+    ---@type LuaForce
+    local force = e.robot.force
+
+    -- We have to scan the whole inventory anyway...  so just do a full conversion.
+    -- But keep the quality chance low to preven this from being a slot machine.
+    convert_quality(e.robot.get_main_inventory(), "poor-0", true, force, 0.1)
 end)
 
 -- Trigger script from dummy items spoiling - we use this to correct the quality of items
