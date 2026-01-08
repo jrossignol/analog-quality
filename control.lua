@@ -1,6 +1,7 @@
 -- Load script modules
 require("scripts.inventory")
 require("scripts.technology")
+require("scripts.cursor")
 
 ---Init script, adds initial qualities to unlocked qualities. This is mainly for existing
 ---games adding the mod.
@@ -10,6 +11,12 @@ script.on_init(function()
             init_quality(force)
         end
     end
+
+    setup_quality_map()
+end)
+
+script.on_configuration_changed(function()
+    setup_quality_map()
 end)
 
 ---Event handling for player creation, ensures the player's force has the initial tech.
@@ -84,11 +91,23 @@ script.on_event(defines.events.on_script_trigger_effect, function(e)
 end)
 
 ---Event handler for player surface changes - triggers off-world research on first visit.
-script.on_event(defines.events.on_player_changed_surface, function(event)
-    on_player_changed_surface_handler(event)
+script.on_event(defines.events.on_player_changed_surface, function(e)
+    on_player_changed_surface_handler(e)
 end)
 
 ---Event handler for research completion - triggers offworld science research.
-script.on_event(defines.events.on_research_finished, function(event)
-    on_research_finished_handler(event)
+script.on_event(defines.events.on_research_finished, function(e)
+    on_research_finished_handler(e)
+end)
+
+script.on_event(defines.events.on_pre_build, function(e)
+    on_pre_build_handler(e)
+end)
+
+script.on_event(defines.events.on_player_cursor_stack_changed, function(e)
+    on_player_cursor_stack_changed_handler(e)
+end)
+
+script.on_event(defines.events.on_player_pipette, function(e)
+    on_player_pipette_handler(e)
 end)
